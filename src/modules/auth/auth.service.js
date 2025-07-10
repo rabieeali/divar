@@ -21,7 +21,7 @@ class AuthService {
     }
 
     async sendOtp(mobile) {
-        const user = this.#model.findOne({ mobile })
+        const user = await this.#model.findOne({ mobile })
         const now = new Date().getTime()
         const otp = {
             code: crypto.randomInt(10_000, 99_999),
@@ -42,7 +42,20 @@ class AuthService {
         return user
     }
 
-    async checkOtp(mobile, code) { }
+    async checkOtp(mobile, code) {
+        const user = await this.checkExistByMobile(mobile)
+        const now = new Date().getTime()
+
+        if (user?.otp?.expiresIn < now) throw new createHttpError().Unauthorized(AuthMessage.OtpCodeExpired)
+        if (user?.otp?.code !== code) throw new createHttpError().Unauthorized(AuthMessage.OtpCodeIncorrect)
+
+        if (!user?.verifiedMobile) {
+            user.verifiedMobile = true
+            await user.save()
+        }
+
+        return user
+    }
 }
 
 

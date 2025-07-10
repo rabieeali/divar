@@ -3,6 +3,7 @@ const dotenv = require('dotenv')
 const swaggerConfig = require('./src/config/swagger.config')
 const mainRouter = require('./src/app.routes')
 const notFoundHandler = require('./src/common/exception/not-found.handler')
+const allExceptionHandler = require('./src/common/exception/all-exception.handler')
 dotenv.config()
 
 async function main() {
